@@ -3,7 +3,7 @@ import ChessEngine
 import pygame as p
 import math
 
-
+#kassio
 width = height = 512
 dim = 8 #Dimensões (8x8)
 sqsize = height // dim
