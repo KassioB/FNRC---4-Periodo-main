@@ -125,8 +125,9 @@ class GameState():
                 else:  # fora do tabuleiro
                     break
 
-    def getQueenMoves(self, r, c, moves):
-        pass
+    def getQueenMoves(self, r, c, moves): # a rainha tem os mesmos movimentos da torre e do bispo
+        self.getRookMoves(r, c, moves)
+        self.getBishopMoves(r, c, moves)
 
     def getKnightMoves(self, r, c, moves):
         knightMoves = ((-2, -1), (-2, 1), (-1, -2), (-1, 2), (1, -2), (1, 2), (2, -1), (2, 1))
@@ -140,7 +141,15 @@ class GameState():
                     moves.append(Move((r, c), (endRow, endCol), self.board))
 
     def getKingMoves(self, r, c, moves):
-        pass
+        kingMoves = ((-1, -1), (-1, 0), (-1, 1), (0, -1), (0, 1), (1, -1), (1, 0), (1, 1))
+        allyColor = "w" if self.whiteToMove else "b"
+        for i in range(8):
+            endRow = r + kingMoves[i][0]
+            endCol = c + kingMoves[i][1]
+            if 0 <= endRow < 8 and 0 <= endCol < 8:  # no tabuleiro
+                endPiece = self.board[endRow][endCol]
+                if endPiece[0] != allyColor:  # nao é uma peça aliada
+                    moves.append(Move((r, c), (endRow, endCol), self.board))
 
     def getCastleMoves(self, r, c, moves):
         pass
