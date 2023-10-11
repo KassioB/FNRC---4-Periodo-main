@@ -31,7 +31,7 @@ class GameState():
         self.checkMate = False
         self.stalemate = False
 
-        self.enpassantPossible = ()
+        self.enpassantPossible = () # cordinadas para o quadrado onde o en passant é possivel
 
         self.currentCastlingRight = castleRights(True, True, True, True)
         self.castleRightsLog = [castleRights(self.currentCastlingRight.wks, self.currentCastlingRight.bks,
@@ -60,12 +60,12 @@ class GameState():
             self.enpassantPossible = ((move.startRow + move.endRow) // 2, move.startCol)
         else:
             self.enpassantPossible = ()
-
+        # movimento roque (castle)
         if move.isCastleMove:
-            if move.endCol - move.startCol == 2:
+            if move.endCol - move.startCol == 2: # movimento roque (castle) no lado do rei
                 self.board[move.endRow][move.endCol-1] = self.board[move.endRow][move.endCol+1]
                 self.board[move.endRow][move.endCol+1] = '--'
-            else:
+            else: # movimento roque (castle) no lado da rainha
                 self.board[move.endRow][move.endCol+1] = self.board[move.endRow][move.endCol-2]
                 self.board[move.endRow][move.endCol-2] = '--'
 
@@ -100,10 +100,10 @@ class GameState():
 
             # desfazendo o movimento castle
             if move.isCastleMove:
-                if move.endCol - move.startCol == 2:
+                if move.endCol - move.startCol == 2: # lado do rei
                     self.board[move.endRow][move.endCol+1] = self.board[move.endRow][move.endCol-1]
                     self.board[move.endRow][move.endCol-1] = '--'
-                else:
+                else: # lado da rainha
                     self.board[move.endRow][move.endCol-2] = self.board[move.endRow][move.endCol+1]
                     self.board[move.endRow][move.endCol+1] = '--'
 
@@ -112,7 +112,7 @@ class GameState():
             self.currentCastlingRight = self.castleRightsLog[-1]
 
 
-    def updateCastleRights(self, move):
+    def updateCastleRights(self, move): #atualiza o castle rights (roque) á peça movida
         if move.pieceMoved == 'wK':
             self.currentCastlingRight.wks = False
             self.currentCastlingRight.wqs = False
@@ -121,17 +121,17 @@ class GameState():
             self.currentCastlingRight.bqs = False
         elif move.pieceMoved == 'wR':
             if move.startRow == 7:
-                if move.startCol == 0:
+                if move.startCol == 0: # torre da esquerda
                     self.currentCastlingRight.wqs = False
-                elif move.startCol == 7:
+                elif move.startCol == 7: # torre da direita
                     self.currentCastlingRight.wks = False
 
         elif move.pieceMoved == 'bR':
             if move.startRow == 0:
                 if move.startCol == 0:
-                    self.currentCastlingRight.bqs = False
+                    self.currentCastlingRight.bqs = False # torre da esquerda
                 elif move.startCol == 7:
-                    self.currentCastlingRight.bks = False
+                    self.currentCastlingRight.bks = False # torre da direita
 
 
 
@@ -144,12 +144,9 @@ class GameState():
         moves = self.getAllPossibleMoves()
 
         if self.whiteToMove:
-            kingRow = self.whiteKingLocation[0]
-            kingCol = self.whiteKingLocation[1]
-
+            self.getCastleMoves(self.whiteKingLocation[0], self.whiteKingLocation[1], moves)
         else:
-            kingRow = self.blackKingLocation[0]
-            kingCol = self.blackKingLocation[1]
+            self.getCastleMoves(self.blackKingLocation[0], self.blackKingLocation[1], moves)
 
         # retrocede na lista
         for i in range(len(moves)-1,-1,-1):
@@ -324,6 +321,7 @@ class GameState():
                 endPiece = self.board[endRow][endCol]
                 if endPiece[0] != allyColour: # Não for um aliado (casa vazia ou peça inimiga)
                     moves.append(Move((r, c), (endRow, endCol), self.board))
+
 
     def getCastleMoves(self, r, c, moves):
         # não posso fazer castle se um quadrado estiver sob ataque
