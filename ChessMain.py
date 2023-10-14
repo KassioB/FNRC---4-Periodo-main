@@ -3,10 +3,10 @@ import pygame as p
 import math
 
 
-width = height = 512
+width = height = 500
 dim = 8 #Dimensions (8x8)
 sqsize = height // dim
-maxfps = 15
+maxfps = 20
 images = {} 
 
 def loadImages():
@@ -66,7 +66,7 @@ def main():
         if moveMade:
             validMoves = gs.getValidMoves()
             moveMade = False
-        drawGameState(screen, gs)
+        drawGameState(screen, gs, validMoves, sqSelected)
         clock.tick(maxfps)
         p.display.flip()
 
@@ -79,14 +79,26 @@ def main():
             running = False
 
 
-            
+def highlightSquares(screen, gs, validMoves, sqSelected):
+    if sqSelected != ():
+        r, c = sqSelected
+        if gs.board[r][c][0] == ('w' if gs.whiteToMove else 'b'):
+            s = p.Surface((sqsize, sqsize))
+            s.set_alpha(100)
+            s.fill(p.Color('dark blue'))
+            screen.blit(s, (c*sqsize, r*sqsize))
+            s.fill(p.Color('green'))
+            for move in validMoves:
+                if move.startRow == r and move.startCol == c:
+                    screen.blit(s, (move.endCol*sqsize, move.endRow*sqsize))
 
-def drawGameState(screen, gs):
+def drawGameState(screen, gs, validMoves, sqSelected):
     drawBoard(screen)
+    highlightSquares(screen, gs, validMoves,sqSelected)
     drawPieces(screen, gs.board)
 
 def drawBoard(screen):
-    colours = [p.Color("white"),p.Color("gray")]
+    colours = [p.Color("white"),p.Color("dark gray")]
     for r in range(dim):
         for c in range(dim):
             colour = colours[((r + c) % 2)]
